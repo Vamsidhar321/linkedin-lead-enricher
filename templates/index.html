@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Enricher - Lead Discovery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 LinkedIn Lead Enricher</h1>
+            <p>Find and enrich LinkedIn leads from companies and keywords</p>
+        </header>
+
+        <main>
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('input')">📝 Input</button>
+                <button class="tab-button" onclick="switchTab('progress')">⏳ Progress</button>
+                <button class="tab-button" onclick="switchTab('results')">📊 Results</button>
+            </div>
+
+            <!-- Input Tab -->
+            <section id="input" class="tab-content active">
+                <div class="form-container">
+                    <form id="enrichmentForm">
+                        <!-- Company URLs -->
+                        <div class="form-section">
+                            <h3>📊 Company URLs (Optional)</h3>
+                            <label>Enter LinkedIn company profile URLs (one per line)</label>
+                            <textarea id="companyUrls" rows="4">https://www.linkedin.com/company/microsoft/
+https://www.linkedin.com/company/google/</textarea>
+                        </div>
+
+                        <!-- Keywords -->
+                        <div class="form-section">
+                            <h3>🔍 Keywords/Topics (Optional)</h3>
+                            <label>Enter keywords to search (one per line)</label>
+                            <textarea id="keywords" rows="4">B2B SaaS outbound
+Generative AI in Sales</textarea>
+                        </div>
+
+                        <!-- Time Window -->
+                        <div class="form-section">
+                            <h3>📅 Time Window</h3>
+                            <div class="date-group">
+                                <div class="form-group">
+                                    <label for="startDate">Start Date:</label>
+                                    <input type="date" id="startDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="endDate">End Date:</label>
+                                    <input type="date" id="endDate" required>
+                                </div>
+                            </div>
+                            <div class="preset-buttons">
+                                <button type="button" onclick="setTimeWindow(7)">Last 7 Days</button>
+                                <button type="button" onclick="setTimeWindow(14)">Last 14 Days</button>
+                                <button type="button" onclick="setTimeWindow(30)">Last 30 Days</button>
+                            </div>
+                        </div>
+
+                        <!-- Slack -->
+                        <div class="form-section">
+                            <h3>🔔 Notifications</h3>
+                            <div class="form-group checkbox">
+                                <input type="checkbox" id="enableNotifications">
+                                <label for="enableNotifications">Enable Slack Notifications</label>
+                            </div>
+                            <textarea id="slackWebhook" placeholder="https://hooks.slack.com/services/YOUR/WEBHOOK" rows="2" style="display: none;"></textarea>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="form-section">
+                            <button type="submit" class="btn-primary">Start Enrichment</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Progress Tab -->
+            <section id="progress" class="tab-content">
+                <div class="progress-container">
+                    <h3>Enrichment Progress</h3>
+                    <div id="statusMessage" style="display: none; padding: 15px; background: #e8f5e9; color: #2e7d32; border-radius: 5px; margin-bottom: 20px;"></div>
+                    <div id="errorMessage" style="display: none; padding: 15px; background: #ffebee; color: #c62828; border-radius: 5px; margin-bottom: 20px;"></div>
+
+                    <!-- Stage Status Indicators -->
+                    <div class="stage-status" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e1e1e1;">
+                        <h4 style="margin-bottom: 15px; color: #333;">Processing Stages</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #0a66c2;">
+                                <strong>Company Scraping:</strong> <span id="companyStatus">Waiting...</span>
+                            </div>
+                            <div style="padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #0a66c2;">
+                                <strong>Keyword Scraping:</strong> <span id="keywordStatus">Waiting...</span>
+                            </div>
+                            <div style="padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #0a66c2;">
+                                <strong>Engagement Analysis:</strong> <span id="engagementStatus">Waiting...</span>
+                            </div>
+                            <div style="padding: 10px; background: white; border-radius: 5px; border-left: 3px solid #0a66c2;">
+                                <strong>Profile Enrichment:</strong> <span id="enrichmentStatus">Waiting...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Display -->
+                    <div class="stats-display">
+                        <div class="stat-item">
+                            <div class="stat-label">Posts Found</div>
+                            <div class="stat-value" id="postsCount">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Engagements Found</div>
+                            <div class="stat-value" id="engagementsCount">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Unique People</div>
+                            <div class="stat-value" id="peopleCount">0</div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; color: #666; margin-top: 40px;" id="progressPlaceholder">
+                        No active enrichment. Go to Input tab to start.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Results Tab -->
+            <section id="results" class="tab-content">
+                <div class="results-container">
+                    <h3>Export & Filter Results</h3>
+                    <p style="text-align: center; color: #666; margin-top: 40px;">
+                        No results yet. Start an enrichment in the Input tab.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
