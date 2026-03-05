@@ -95,24 +95,32 @@ A powerful web application for discovering and enriching LinkedIn leads from com
 
 ## 🌐 Deployment Options
 
-### Option 1: GitHub (Recommended for Sharing)
-Perfect for sharing code with your manager and team.
+### Option 1: GitHub Actions + Render.com (Recommended for Automated Deployment)
+Deploy automatically to Render.com when you push code to GitHub.
 
-1. **Create GitHub repository**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: LinkedIn Lead Enricher"
-   git branch -M main
-   git remote add origin https://github.com/yourusername/linkedin-lead-enricher.git
-   git push -u origin main
-   ```
+1. **Set up Render.com**
+   - Go to https://render.com and sign up with GitHub
+   - Create a new Web Service from your GitHub repository
+   - Use the `render.yaml` configuration file (already included)
 
-2. **Share the link** with your manager
-   - They can view the code on GitHub
-   - Follow the "Quick Start" section to run it locally
+2. **Configure GitHub Secrets**
+   - Go to your GitHub repository → Settings → Secrets and variables → Actions
+   - Add these secrets:
+     - `RENDER_API_KEY`: Your Render API key (from Render dashboard → Account → API)
+     - `RENDER_SERVICE_ID`: Your service ID (from Render service URL)
 
-### Option 2: Render.com (Recommended for Live Deployment)
+3. **Add Environment Variables in Render**
+   - In Render dashboard, add your environment variables:
+     - `RAPIDAPI_KEY`
+     - `RAPIDAPI_HOST`
+     - `SLACK_WEBHOOK_URL` (optional)
+
+4. **Deploy**
+   - Push code to GitHub main branch
+   - GitHub Actions will automatically deploy to Render
+   - Your app will be available at `https://your-app.onrender.com`
+
+### Option 2: Manual Render.com Deployment
 Free tier available. Flask-compatible cloud platform.
 
 1. **Create Render account**
@@ -151,7 +159,15 @@ Another free-tier option with good Flask support.
 3. **Get your URL**
    - Railway provides your live URL automatically
 
-### Option 4: Heroku (Legacy - Requires Credit Card)
+### Option 4: GitHub (For Code Sharing Only)
+Perfect for sharing code with your manager and team.
+
+1. **Your repository is already on GitHub**
+   - Repository: https://github.com/Vamsidhar321/linkedin-lead-enricher
+   - Share this link with your manager
+   - They can view the code and follow "Quick Start" to run locally
+
+### Option 5: Heroku (Legacy - Requires Credit Card)
 ⚠️ Note: Heroku free tier ended November 2022. Paid dynos required.
 
 ## 📁 Project Structure
